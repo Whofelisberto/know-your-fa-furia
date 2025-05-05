@@ -22,16 +22,10 @@ CONTATO: Formulário de contato para usuários enviarem mensagens.
 
 - plotly - Para gráficos interativos
 
-- easyOCR - Para reconhecimento de texto em imagens.
-
-- openCV - Para processamento de imagens e vídeos.
-
-- numpy - para manipulação de arrays e cálculos numéricos.
-
 ## Como rodar essa case?
 
 1° - Baixe o python na sua máquina , se você tiver melhor ainda.</br>
-2° - baixe as bibliotecas do streamlit, pandas, plotly, easyocr, opencv-python e numpy. O (sqlite3) e o (re) são bibliotecas que ja vem instaladas no python (Se o seu estiver desatualizado ,atualize!!)</br>
+2° - baixe as bibliotecas do streamlit, pandas, plotly. O (sqlite3) e o (re) são bibliotecas que ja vem instaladas no python (Se o seu estiver desatualizado ,atualize!!)</br>
 3° - Para rodar o projeto, insira o comando "streamlit run main.py" no terminal, depois de ter instalado todas as bibliotecas do projeto, você vai receber os link localhost e net logo abaixo.
 
 ### Comandos
@@ -41,9 +35,6 @@ bash:
 pip install streamlit</br>
 pip install pandas</br>
 pip install plotly</br>
-pip install easyocr</br>
-pip install opencv-python</br>
-pip install numpy</br>
 
 
 
