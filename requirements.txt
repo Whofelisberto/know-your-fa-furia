@@ -1,6 +1,7 @@
 streamlit
 pandas
 plotly
-easyocr
 opencv-python-headless
+easyocr==1.6.2
+torch==2.0.1
 numpy
