@@ -3,9 +3,6 @@ import streamlit.components.v1 as components
 import pandas as pd
 import plotly.graph_objects as go
 from database import init_db, salvar_comentario, carregar_comentarios
-import easyocr
-import cv2
-import numpy as np
 import re
 
 # Chama a função de banco de dados
@@ -85,8 +82,8 @@ with abas[0]:
         st.write(f"🛍️ Já comprou produto? **{comprou_produto}**")
         st.write(f"🎮 Acompanha os jogos? **{acompanha_jogos}**")
         st.write(f"📺 Onde assiste? **{jogo_torce}**")
-        st.write(f"📲 Redes que usa para FURIA: **{', '.join(redes_sociais)}**")
-        st.write(f"🌟 Jogadores favoritos: **{', '.join(jogadores_favoritos)}**")
+        st.write(f"📲 Redes que usa para FURIA: **{', '.join(redes_sociais or [])}**")
+        st.write(f"🌟 Jogadores favoritos: **{', '.join(jogadores_favoritos or [])}**")
         st.write(f"🔥 Nível de fã: **{nota_fan}/10**")
 
     st.subheader("")
@@ -203,7 +200,18 @@ with abas[0]:
 with abas[1]:
     st.title("CADASTRO")
 
+    def validar_email(email):
+        """Função para validar formato de e-mail."""
+        email_regex = r"(^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$)"
+        return re.match(email_regex, email) is not None
+
+
+    def validar_cpf(cpf):
+        """Função simples para validar o formato do CPF (apenas números, 11 dígitos)."""
+        return len(cpf) == 11 and cpf.isdigit()
+
     st.subheader("Faça seu cadastro e entre para nossa família furioso(a)")
+
     with st.form("cadastro_fan"):
         nome = st.text_input("Nome")
         email = st.text_input("E-mail")
@@ -213,58 +221,21 @@ with abas[1]:
         instagram = st.text_input("Instagram (opcional)")
         interesse = st.multiselect("Do que você mais gosta na FURIA?",
                                    ["Jogadores", "Times", "História", "Eventos", "Loja"])
-        uploaded_file = st.file_uploader("Envie a imagem do CPF(frente) para validação dos dados", type=["jpg", "jpeg", "png"])
-
-        if uploaded_file:
-            # Lê e mostra a imagem
-            file_bytes = np.asarray(bytearray(uploaded_file.read()), dtype=np.uint8)
-            image = cv2.imdecode(file_bytes, 1)
-            st.image(image, channels="BGR", caption="Imagem enviada")
-
-            # OCR com EasyOCR
-            with st.spinner("🔍 Extraindo texto..."):
-                reader = easyocr.Reader(['pt'])
-                results = reader.readtext(image, detail=0)
-                texto = " ".join(results)
-                st.subheader("📝 Texto extraído:")
-                st.text(texto)
-
-            # === Validações ===
-            st.subheader("✅ Validações:")
-
-            # CPF
-            cpf = re.search(r"\d{3}\.\d{3}\.\d{3}-\d{2}", texto)
-            if cpf:
-                st.success(f"CPF encontrado: {cpf.group()}")
-            else:
-                st.warning("CPF não encontrado.")
-
-            # Data de validade
-            validade = re.search(r"\d{2}/\d{2}/\d{4}", texto)
-            if validade:
-                st.success(f"Data de validade: {validade.group()}")
-            else:
-                st.warning("Data de validade não identificada.")
-
-            # Nome (pega palavra após "Nome" ou "Nome:")
-            nome = ""
-            for i, word in enumerate(results):
-                if "nome" in word.lower():
-                    if i + 1 < len(results):
-                        nome = results[i + 1]
-                    break
-            if nome:
-                st.success(f"Nome identificado: {nome}")
-            else:
-                st.warning("Nome não identificado.")
         consent = st.checkbox("Autorizo o uso dos meus dados para melhorar minha experiência")
+
         if st.form_submit_button("Enviar"):
-            if consent:
+            # Verificar se os campos obrigatórios estão preenchidos
+            if not nome or not email or not endereco or not cidade or not cpf:
+                st.warning("Todos os campos obrigatórios (nome, e-mail, endereço, cidade e CPF) devem ser preenchidos.")
+            elif not validar_email(email):
+                st.warning("Por favor, insira um e-mail válido.")
+            elif not validar_cpf(cpf):
+                st.warning("Por favor, insira um CPF válido (apenas números, 11 dígitos).")
+            elif not consent:
+                st.warning("Você precisa autorizar o uso dos dados para continuar.")
+            else:
                 st.success("Perfil feito com sucesso!")
                 st.balloons()
-            else:
-                st.warning("Você precisa autorizar o uso dos dados para continuar.")
-
 
     # FURIA CS2
 with abas[2]:
